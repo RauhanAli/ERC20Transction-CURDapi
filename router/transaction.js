@@ -18,7 +18,7 @@ router.post('/address', async (req,res)=>{
         var address = req.body.address;
         console.log(address)
         const tran = await transaction.findOne({address: address});
-        console.log(tran);
+        console.log(tran.address);
         res.json(tran); 
     }catch(e){
         res.send('Something Went Wrong ' + e)
@@ -27,30 +27,40 @@ router.post('/address', async (req,res)=>{
 
 //post the transaction to database
 router.post('/', async(req,res)=>{
-    var address = req.body.address
-    const tran = await transaction.findOne({address: address});
-    //console.log(tran.address)
-    console.log(req.body.address + "body")
         const trans = new transaction({
             address: req.body.address,
             balance: req.body.balance
         })
+        var address = req.body.address
+        // console.log(tran.address)
+        console.log(req.body.address + "body")
+            try{
+                const trans1 = await trans.save()
+                res.json(trans1)
+            }catch(e){
+                res.send('Something Went Wrong ' + e)
+            }
+
+      
         //update the transaction
-        if(tran == req.body.address){
+        const tran = await transaction.findOne({address: address});
+        console.log(tran.address)
+        console.log(req.body.address + "body")
+        if(tran.address == req.body.address){
             const filter = {address: trans.address}
             const update = {balance: trans.balance + tran.balance}
             let doc = await transaction.findOneAndUpdate(filter, update,{
             new:true
             });
         }
-        else{
-        try{
-            const trans1 = await trans.save()
-            res.json(trans1)
-        }catch(e){
-            res.send('Something Went Wrong ' + e)
-        }
-    }
+        // else{
+        // try{
+        //     const trans1 = await trans.save()
+        //     res.json(trans1)
+        // }catch(e){
+        //     res.send('Something Went Wrong ' + e)
+        // }
+    // }
         });
 
 //delete the transcation
